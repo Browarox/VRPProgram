@@ -1,6 +1,5 @@
 import csv
 
-
 index = []
 with open('Data.csv', newline="") as file:
     reader = csv.reader(file)

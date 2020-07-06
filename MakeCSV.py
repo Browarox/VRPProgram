@@ -1,6 +1,6 @@
 import csv
 import psycopg2 as pg2
-from VRPv3.DistanceCalc import distance_calc
+from DistanceCalc import distance_calc
 
 def import_from_db(locations, cur):
     locationsDict = {}

@@ -1,6 +1,6 @@
 import csv
 import psycopg2 as pg2
-from VRPv3.DistanceCalc import distance_calc
+from DistanceCalc import distance_calc
 
 
 conn = pg2.connect(database='VRPLocations', user='postgres', password='jaxr12')

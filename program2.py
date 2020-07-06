@@ -1,4 +1,4 @@
-from VRPv3.ReadCSV import index, locationsCount
+from ReadCSV import index, locationsCount
 from random import shuffle
 
 
