@@ -2,7 +2,6 @@ import ReadCSV as rcsv
 from random import shuffle
 
 
-
 def create_list(locationsCount):
     locationsList = []
     for i in range(1, locationsCount):
@@ -54,7 +53,6 @@ def start():
     optimizedDistance = optimization[0]
     optimizedList = locationsList
     optimizedReturnings = optimization[1]
-
 
     for j in range(iterations):
         locationsList = random_locations(locationsCount)
