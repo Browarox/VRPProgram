@@ -1,52 +1,59 @@
 import csv
-import psycopg2 as pg2
-from DistanceCalc import distance_calc
+from peewee import *
+db = SqliteDatabase('Database/locations.db')
 
-def import_from_db(locations, cur):
+
+class Location(Model):
+    id = IntegerField(primary_key=True)
+    name = CharField()
+    address = CharField()
+    latitude = FloatField()
+    longitude = FloatField()
+
+    class Meta:
+        database = db
+
+
+db.connect()
+dtb = Location()
+
+
+def import_from_db(locations):
     locationsDict = {}
+    declaredlocs = []
     for i in range(1, locations + 1):
-        locationId = input('Podaj ID lokalizacji ' + str(i))
+        check = True
+        while check:
+            locationId = input('Podaj ID lokalizacji ' + str(i))
+            if int(locationId) <= 1 or int(locationId) > 10:
+                print('Proszę podać id z zakresu od 2 do 10 (id=1 to jest magazyn)')
+            elif locationId in declaredlocs:
+                print('Lokacja o id=',locationId, 'już została zadeklarowana. Proszę podać inne id')
+            else:
+                declaredlocs.append(locationId)
+                check = False
         locationsDict[i] = list(locationId)
-        latitudeQuerry = 'select latitude from locations where id = ' + locationId
-        cur.execute(latitudeQuerry)
-        locationsDict[i].append(float(cur.fetchone()[0]))  # to [0] jest potrzebne bo bez tego zwraca tuple
-        longitudeQuerry = 'select longitude from locations where id = ' + locationId
-        cur.execute(longitudeQuerry)
-        locationsDict[i].append(float(cur.fetchone()[0]))
-        locationsDict[i].append(int(input('Podaj zapotrzebowanie w lokacji ' + str(i))))
-    locationsDict[0] = ['1']
-    latitudeQuerry = 'select latitude from locations where id = 1'
-    cur.execute(latitudeQuerry)
-    locationsDict[0].append(float(cur.fetchone()[0]))
-    longitudeQuerry = 'select longitude from locations where id = 1'
-    cur.execute(longitudeQuerry)
-    locationsDict[0].append(float(cur.fetchone()[0]))
-    locationsDict[0].append(0)
+        check = True
+        while check:
+            loc_demand = (int(input('Podaj zapotrzebowanie w lokacji ' + str(i))))
+            if loc_demand > 1500:
+                print('Przekroczono max. ładowność pojazdu. Proszę podać mniejszą wartość')
+            else:
+                check = False
+        locationsDict[i].append(loc_demand)
     return locationsDict
 
-def start():
+
+def make_demand():
     locations = int(input('Podaj liczbę lokacji'))
-
-    conn = pg2.connect(database='VRPLocations', user='postgres', password='jaxr12')
-    cur = conn.cursor()
-
-    locationsDict = import_from_db(locations, cur)
-
-    with open('Data.csv', 'w',  newline='') as dataCsv:
-        fieldnames = ['']
-        for i in range(locations+1):
-            fieldnames.append(i)
-        fieldnames.append('zapotrzebowanie')
-        fieldnames.append('id')
-        distance = csv.writer(dataCsv, delimiter=';')
-        distance.writerow(fieldnames)
-        for i in range(locations+1):
-            distancesRow = [i]
-            for j in range(locations+1):
-                if i != j:
-                    distancesRow.append(distance_calc((locationsDict[i][1], locationsDict[i][2]), ((locationsDict[j][1], locationsDict[j][2]))))
-                else:
-                    distancesRow.append(0)
-            distancesRow.append(locationsDict[i][3])
-            distancesRow.append(locationsDict[i][0])
-            distance.writerow(distancesRow)
+    locationsDict = import_from_db(locations)
+    with open('Demand.csv', 'w', newline='') as demand_file:
+        fieldnames = ['id', 'zapotrzebowanie']
+        demand = csv.writer(demand_file, delimiter=';')
+        demand.writerow(fieldnames)
+        demand_list = [fieldnames]
+        for key_id, value_demand in locationsDict.items():
+            demand_row = [value_demand[0], value_demand[1]]
+            demand_list.append(demand_row)
+            demand.writerow(demand_row)
+    return demand_list

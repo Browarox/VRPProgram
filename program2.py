@@ -1,5 +1,6 @@
-from ReadCSV import index, locationsCount
+import ReadCSV as rcsv
 from random import shuffle
+
 
 
 def create_list(locationsCount):
@@ -9,7 +10,7 @@ def create_list(locationsCount):
     return locationsList
 
 
-def route(locationsList, maxCapacity):
+def route(locationsList, maxCapacity, locationsCount, index):
     leftCapacity = maxCapacity
     fullDistance = 0
     returning = []
@@ -28,7 +29,8 @@ def route(locationsList, maxCapacity):
             returning.append(index[0][driveFrom+1])
     return [fullDistance, returning]
 
-def random_locations():
+
+def random_locations(locationsCount):
     locationsList = []
     randomList = create_list(locationsCount)
     shuffle(randomList)
@@ -37,26 +39,26 @@ def random_locations():
     locationsList.append(0)
     return locationsList
 
-def start():
-    maxCapacity = 1500
-    fullDistance = 0
-    iterations = 1000
 
-    returnings = []
+def start():
+    index = rcsv.index()
+    locationsCount = len(index) - 1
+    maxCapacity = 1500
+    iterations = 50000
     locationsList = []
     for _ in range(locationsCount):
         locationsList.append(_)
     locationsList.append(0)
 
-    optimization = route(locationsList, maxCapacity)
+    optimization = route(locationsList, maxCapacity, locationsCount, index)
     optimizedDistance = optimization[0]
     optimizedList = locationsList
     optimizedReturnings = optimization[1]
 
 
     for j in range(iterations):
-        locationsList = random_locations()
-        optimization = route(locationsList, maxCapacity)
+        locationsList = random_locations(locationsCount)
+        optimization = route(locationsList, maxCapacity, locationsCount, index)
         newDistance = optimization[0]
         returnings = optimization[1]
         if newDistance < optimizedDistance:
@@ -71,4 +73,4 @@ def start():
         routeList.append(index[int(id + 1)][locationsCount+2])
     for id in optimizedReturnings:
         returningList.append(index[int(id) + 1][locationsCount+2])
-    print('Optymalna trasa wiedzie przez lokacje o następujących ID:', routeList, 'o długości:', round(optimizedDistance, 2), 'km. Po punktach', returningList, 'należy ponownie załadować samochód')
+    return routeList, optimizedDistance, returningList
