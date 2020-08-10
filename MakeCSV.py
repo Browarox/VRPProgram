@@ -24,18 +24,18 @@ def import_from_db(locations):
     for i in range(1, locations + 1):
         check = True
         while check:
-            locationId = input('Podaj ID lokalizacji ' + str(i))
-            if int(locationId) <= 1 or int(locationId) > 10:
+            locationId = int(input('Podaj ID lokalizacji ' + str(i) + ':\n'))
+            if locationId <= 1:
                 print('Proszę podać id z zakresu od 2 do 10 (id=1 to jest magazyn)')
             elif locationId in declaredlocs:
-                print('Lokacja o id=',locationId, 'już została zadeklarowana. Proszę podać inne id')
+                print('Lokacja o id=', locationId, 'już została zadeklarowana. Proszę podać inne id')
             else:
                 declaredlocs.append(locationId)
                 check = False
-        locationsDict[i] = list(locationId)
+        locationsDict[i] = [locationId]
         check = True
         while check:
-            loc_demand = (int(input('Podaj zapotrzebowanie w lokacji ' + str(i))))
+            loc_demand = (int(input('Podaj zapotrzebowanie w lokacji ' + str(i)+':\n')))
             if loc_demand > 1500:
                 print('Przekroczono max. ładowność pojazdu. Proszę podać mniejszą wartość')
             else:
